@@ -6,7 +6,7 @@ use base 'AnyEvent::DNS';
 
 use Data::Dumper;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub import {
 	my $package = shift;
@@ -21,14 +21,6 @@ sub import {
 }
 
 
-sub new {
-	my $class = shift;
-	my $self = $class->SUPER::new(@_);
-	$self->{_cache} = {};
-	return $self;
-}
-
-
 sub resolve {
 	my $cb = pop @_;
 	my ($self, $qname, $qtype, %opt) = @_;
@@ -36,7 +28,8 @@ sub resolve {
 	# If we have the value cached then we serve it from there
 	my $cache = $self->{_cache}{$qtype} ||= {};
 	if (exists $cache->{$qname}) {
-		$cb->($cache->{$qname} ? ($cache->{$qname}) : ());
+		my $response = $cache->{$qname};
+		$cb->($response ? ($response) : ());
 		return;
 	}
 
@@ -46,9 +39,11 @@ sub resolve {
 		$qtype,
 		%opt,
 		sub{
-			# Note that the first time multiple queries could be done to the
-			# same arguments if the value is not cached already. This is why we
-			# assign a value only if we don't have a good value yet.
+			# Note that it could be possible that the multiple DNS request are
+			# done a new qname. For instance if an application is doing multiple
+			# concurrent HTTP request to the same host then there will be at
+			# least one DNS request per HTTP request. That's why we only cache
+			# the results of the first DNS request that's successful.
 			$cache->{$qname} ||= @_ ? $_[0] : undef;
 			$cb->(@_);
 		}
