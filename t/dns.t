@@ -5,7 +5,6 @@ use warnings;
 
 use Test::More tests => 9;
 
-use AnyEvent::Impl::Perl;
 use AnyEvent;
 use AnyEvent::CacheDNS ':register';
 use AnyEvent::DNS;
@@ -14,10 +13,9 @@ use Data::Dumper;
 
 sub main {
 
-	# Make sure we timeout faster
+	# Make sure we timeout fast
 	my $dns = AnyEvent::DNS::resolver;
 	isa_ok($dns, 'AnyEvent::CacheDNS');
-
 	$dns->{timeout} = [0.5];
 	$dns->_compile();
 
@@ -25,12 +23,12 @@ sub main {
 
 	my $host = "www.bratislavafestival.sk";
 	$cv = AnyEvent->condvar;
-	$dns->resolve($host, 'a', sub { $cv->send(@_) });
+	$dns->resolve($host, 'a', $cv);
 	my ($first) = $cv->recv();
 	ok($first, "First DNS lookup");
 
 	$cv = AnyEvent->condvar;
-	$dns->resolve($host, 'a', sub { $cv->send(@_) });
+	$dns->resolve($host, 'a', $cv);
 	my ($second) = $cv->recv();
 	ok($second, "Second DNS lookup");
 

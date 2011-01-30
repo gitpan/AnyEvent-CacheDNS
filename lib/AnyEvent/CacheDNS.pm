@@ -6,7 +6,7 @@ use base 'AnyEvent::DNS';
 
 use Data::Dumper;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub import {
 	my $package = shift;
@@ -65,7 +65,6 @@ AnyEvent::CacheDNS - Simple DNS resolver with caching
 
 =head1 SYNOPSIS
 
-	use AnyEvent::Impl::Perl;
 	use AnyEvent;
 	use AnyEvent::HTTP;
 	
