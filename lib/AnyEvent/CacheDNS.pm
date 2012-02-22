@@ -6,10 +6,10 @@ use base 'AnyEvent::DNS';
 
 use Data::Dumper;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # Detect AnyEvent >= 6.0.1
-my $IS_AE_6X = $^V ge "v5.10.0"
+my $IS_AE_6X = version->can("parse")
 	? version->parse(AnyEvent->VERSION()) >= version->parse('v6.0.1')
 	: AnyEvent->VERSION !~ /^ (?: [0-5]\. | 6\.0(?:\.0)? $ )/x;
 
@@ -19,7 +19,7 @@ my $DEFAULT_TTL = undef;
 sub import {
 	my $package = shift;
 	my @options = @_;
-	
+
 	while (@options) {
 		my $key = shift @options;
 		if ($key eq ':register') {
